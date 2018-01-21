@@ -6,10 +6,7 @@ class PatienteSearchPage extends Component {
 
     render() {
         return (
-            <div>
-                <h1>Liste des patientes</h1>
                 <PatienteSearchForm/>
-            </div>
         )
     }
 }

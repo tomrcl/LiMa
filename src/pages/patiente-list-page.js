@@ -11,10 +11,7 @@ class PatienteListPage extends Component {
 
     render() {
         return (
-            <div>
-                <h1>Liste des patientes</h1>
                 <PatienteList patientes={this.props.patientes} deletePatiente={this.props.deletePatiente}/>
-            </div>
         )
     }
 }

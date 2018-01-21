@@ -20,6 +20,8 @@ export function newPatiente() {
 }
 
 export function savePatiente(patiente) {
+    // pour ne mettre qu'une seule fois la date de création
+    patiente.createdAt = new Date();
     return dispatch => {
         return dispatch({
             type: 'SAVE_PATIENTE',

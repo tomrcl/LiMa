@@ -6,7 +6,7 @@ module.exports = function (app) {
   const mongooseClient = app.get('mongooseClient');
   const { Schema } = mongooseClient;
   const patiente = new Schema({
-    nomJf: { type: String, required: [true, 'Nom de jeune fille requis'] },
+    nomJf: String,
     nom: String,
     prenom: String,
     dateNaissance: String,
@@ -30,11 +30,19 @@ module.exports = function (app) {
       activite: String
     },
     specialistes: String,
-    allergies: String,
+    allergies: {
+      ouinon: String,
+      autres: String
+    },
     groupeSanguin: {
       groupe: String,
       rhesus: String,
-      carteAjour: String
+      carteAjour: String,
+      pere: {
+        groupe: String,
+        rhesus: String,
+        carteAjour: String
+      }
     },
     antecedents: {
       familiaux: {
@@ -58,7 +66,7 @@ module.exports = function (app) {
         autres: String
       }
     },
-    createdAt: { type: Date, 'default': Date.now },
+    createdAt: Date,
     updatedAt: { type: Date, 'default': Date.now }
 
   });
