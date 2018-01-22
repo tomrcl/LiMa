@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import {
-    Prompt
-} from 'react-router-dom'
-import { Form, Button, Input, Checkbox, Transition, Segment, Grid, Radio, TextArea, Icon, Divider, Label, Container } from 'semantic-ui-react';
+import {Prompt} from 'react-router-dom'
+import { Form, Button, Input, Checkbox, Transition, Segment, Grid, Radio, TextArea, Icon, Divider, Label } from 'semantic-ui-react';
 import { Field, reduxForm } from 'redux-form';
 import classnames from 'classnames';
 import Moment from 'moment';
@@ -17,12 +15,12 @@ const validate = (values) => {
     const errors = {name:{}};
     if(!values.nomJf) {
         errors.nomJf = {
-            message: 'Nom de JF obligatoire'
+            message: 'Nom de jeune fille obligatoire'
         }
     }
     if(values.email && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
         errors.email = {
-            message: 'Invalid email address'
+            message: 'Adresse email invalide'
         }
     }
     return errors;
@@ -41,7 +39,15 @@ class PatienteForm extends Component {
         showPartenaireForm: false,
         age: '',
         agePartenaire: '',
-        showPereGroupeSanguinForm: false
+        showPereGroupeSanguinForm: false,
+        imc: ''
+    }
+
+    fullName(patiente, age) {
+        return patiente.nomJf +
+            ' ' + patiente.nom +
+            ' ' + patiente.prenom +
+            ' (' + age + ' ans)'
     }
 
     statutRadioHandle = ( value ) => {
@@ -60,28 +66,38 @@ class PatienteForm extends Component {
         this.setState({ agePartenaire: calculAge(value) });
     }
 
-    componentWillReceiveProps = (nextProps) => { // Receive Contact data Asynchronously
-        const {patiente} = nextProps;
-        if (patiente._id !== this.props.patiente._id) { // Initialize form only once
-            console.log(patiente);
-            this.props.initialize(patiente);
-            setTimeout(() => this.setState({
-                showPartenaireForm: patiente.statut === 'En couple',
-                age: calculAge(patiente.dateNaissance),
-                // agePartenaire: calculAge(patiente.partenaire.dateNaissance),
-                // showPereGroupeSanguinForm : patiente.groupeSanguin.rhesus === '-'
-            }),500),
-            console.log(patiente);
+    calculImc = () => {
+        const taille = document.getElementsByName('taille')[0].value;
+        const poids = document.getElementsByName('poids')[0].value;
 
+        if (taille && poids) {
+            // poids / taille^2
+            this.setState({ imc: ((poids / (taille*taille))*10000).toFixed(2) });
+        } else {
+            this.setState({ imc: '' });
         }
     }
 
-    renderFieldInput = ({input, label, type, icon, meta: {touched, error}}) => (
+    componentWillReceiveProps = (nextProps) => { // Receive Contact data Asynchronously
+        const {patiente} = nextProps;
+        if (patiente._id !== this.props.patiente._id) { // Initialize form only once
+            this.props.initialize(patiente);
+            this.setState({
+                showPartenaireForm: patiente.statut === 'En couple',
+                age: calculAge(patiente.dateNaissance),
+                agePartenaire: patiente.partenaire ? calculAge(patiente.partenaire.dateNaissance) : '',
+                showPereGroupeSanguinForm : patiente.groupeSanguin ? patiente.groupeSanguin.rhesus === '-' : '',
+                imc: patiente.poids && patiente.taille ? ((patiente.poids / (patiente.taille*patiente.taille))*10000).toFixed(2) : ''
+            });
+        }
+    }
+
+    renderFieldInput = ({input, placeholder, type, icon, label, labelPosition, meta: {touched, error}}) => (
         <Form.Field className={classnames({error: touched && error})}>
-            {label &&
-            <Label>{label}</Label>
+            {placeholder &&
+            <Label>{placeholder}</Label>
             }
-            <Input {...input} placeholder={label} type={type}/>
+            <Input {...input} placeholder={placeholder} type={type} label={label} labelPosition={labelPosition}/>
             {touched && error && <span className="error">{error.message}</span>}
         </Form.Field>
     )
@@ -97,16 +113,11 @@ class PatienteForm extends Component {
         </Form.Field>
     )
 
-    renderFieldTextarea = ({input, label, type, meta: {touched, error}}) => (
+    renderFieldTextarea = ({input, label, displayLabel=true, type, meta: {touched, error}}) => (
         <Form.Field className={classnames({error: touched && error})}>
+            {displayLabel &&
             <Label>{label}</Label>
-            <TextArea {...input} placeholder={label}/>
-            {touched && error && <span className="error">{error.message}</span>}
-        </Form.Field>
-    )
-
-    renderFieldTextareaNoLabel = ({input, label, type, meta: {touched, error}}) => (
-        <Form.Field className={classnames({error: touched && error})}>
+            }
             <TextArea {...input} placeholder={label}/>
             {touched && error && <span className="error">{error.message}</span>}
         </Form.Field>
@@ -128,8 +139,8 @@ class PatienteForm extends Component {
         </Form.Field>
     )
 
-    renderFieldCheckbox = ({ input, label }) => (
-        <Form.Field>
+    renderFieldCheckbox = ({ input, label, meta: {touched, error}}) => (
+        <Form.Field className={classnames({error: touched && error})}>
             <Checkbox
                 label={label}
                 checked={input.value ? true : false}
@@ -138,18 +149,18 @@ class PatienteForm extends Component {
         </Form.Field>
     )
 
-    renderFieldRadioHorizontal = ({ input, label, labels, name }) => (
-        <Form.Field>
+    renderFieldRadioHorizontal = ({ input, label, labels, name, meta: {touched, error}}) => (
+        <Form.Field className={classnames({error: touched && error})}>
             {label &&
             <Label>{label}</Label>
             }
             <Grid columns='equal'>
                 <Grid.Row>
-                {labels.map( (label) => (
+                {labels.map( label => (
 
-                        <Grid.Column>
+                        <Grid.Column key={name + '_' + label }>
                             <Radio
-                                key={name + '_' + label }
+
                                 name={name}
                                 label={label}
                                 value={label}
@@ -163,16 +174,16 @@ class PatienteForm extends Component {
         </Form.Field>
     )
 
-    renderFieldRadioVertical = ({ input, label, labels, name }) => (
-        <Form.Field>
+    renderFieldRadioVertical = ({ input, label, labels, name, meta: {touched, error}}) => (
+        <Form.Field className={classnames({error: touched && error})}>
             <Label>{label}</Label>
             <Grid columns='equal'>
                     {labels.map( (label) => (
-                <Grid.Row>
+                <Grid.Row key={name + '_' + label }>
 
                         <Grid.Column>
                             <Radio
-                                key={name + '_' + label }
+
                                 name={name}
                                 label={label}
                                 value={label}
@@ -188,7 +199,7 @@ class PatienteForm extends Component {
 
     render() {
         const {handleSubmit, pristine, submitting, loading} = this.props;
-        const {showPartenaireForm, age, agePartenaire, showPereGroupeSanguinForm} = this.state;
+        const {showPartenaireForm, age, agePartenaire, showPereGroupeSanguinForm, imc} = this.state;
 
         return (
             <div>
@@ -197,7 +208,7 @@ class PatienteForm extends Component {
                     message='Etes-vous sur de vouloir quitter le formulaire ?'
                 />
 
-                <h1 style={{marginTop: "1em"}}>{this.props.patiente._id ? 'Modifier fiche '+this.props.patiente.nomJf + (age?' ('+age+' ans)':''): 'Nouvelle patiente'}</h1>
+                <h1 style={{marginTop: "1em"}}>{this.props.patiente._id ? 'Modifier fiche '+ this.fullName(this.props.patiente, age) : 'Nouvelle patiente'}</h1>
 
 
                 <Form onSubmit={handleSubmit} loading={loading}>
@@ -209,9 +220,9 @@ class PatienteForm extends Component {
 
                         <Grid.Row>
                             <Grid.Column>
-                                <Field name="nomJf" type="text" component={this.renderFieldInput} label="Nom de jeune fille"/>
-                                <Field name="nom" type="text" component={this.renderFieldInput} label="Nom d'épouse"/>
-                                <Field name="prenom" type="text" component={this.renderFieldInput} label="Prénom"/>
+                                <Field name="nomJf" type="text" component={this.renderFieldInput} placeholder="Nom de jeune fille"/>
+                                <Field name="nom" type="text" component={this.renderFieldInput} placeholder="Nom d'épouse"/>
+                                <Field name="prenom" type="text" component={this.renderFieldInput} placeholder="Prénom"/>
                                 <Grid columns='equal'>
                                     <Grid.Row>
                                         <Grid.Column>
@@ -236,7 +247,7 @@ class PatienteForm extends Component {
 
                         <Grid.Row>
                             <Grid.Column>
-                                <Field name="activite" type="text" component={this.renderFieldInput} label="Activité"/>
+                                <Field name="activite" type="text" component={this.renderFieldInput} placeholder="Activité"/>
                                 <Field name='activite' labels={['Sans profession', 'Mère au foyer', 'Recherche d\'emploi']} component={this.renderFieldRadioHorizontal} />
                             </Grid.Column>
                         </Grid.Row>
@@ -250,10 +261,10 @@ class PatienteForm extends Component {
                                         <Grid columns='equal'>
                                             <Grid.Row>
                                                 <Grid.Column>
-                                                    <Field name="partenaire.nom" type="text" component={this.renderFieldInput} label="Nom"/>
+                                                    <Field name="partenaire.nom" type="text" component={this.renderFieldInput} placeholder="Nom"/>
                                                 </Grid.Column>
                                                 <Grid.Column>
-                                                    <Field name="partenaire.prenom" type="text" component={this.renderFieldInput} label="Prénom"/>
+                                                    <Field name="partenaire.prenom" type="text" component={this.renderFieldInput} placeholder="Prénom"/>
                                                 </Grid.Column>
                                             </Grid.Row>
                                             <Grid.Row>
@@ -273,7 +284,7 @@ class PatienteForm extends Component {
                                                     </Grid>
                                                 </Grid.Column>
                                                 <Grid.Column>
-                                                    <Field name="partenaire.activite" type="text" component={this.renderFieldInput} label="Activité"/>
+                                                    <Field name="partenaire.activite" type="text" component={this.renderFieldInput} placeholder="Activité"/>
                                                 </Grid.Column>
                                             </Grid.Row>
                                         </Grid>
@@ -285,18 +296,18 @@ class PatienteForm extends Component {
 
                         <Grid.Row>
                             <Grid.Column>
-                                <Field name="medecinTraitant.nom" type="text" component={this.renderFieldInput} label="Médecin traitant"/>
+                                <Field name="medecinTraitant.nom" type="text" component={this.renderFieldInput} placeholder="Médecin traitant"/>
                             </Grid.Column>
                             <Grid.Column>
-                                <Field name="medecinTraitant.ville" type="text" component={this.renderFieldInput} label="Ville"/>
+                                <Field name="medecinTraitant.ville" type="text" component={this.renderFieldInput} placeholder="Ville"/>
                             </Grid.Column>
                         </Grid.Row>
                         <Grid.Row>
                             <Grid.Column>
-                                <Field name="sfGyneco.nom" type="text" component={this.renderFieldInput} label="Sage femme / Gynécologue"/>
+                                <Field name="sfGyneco.nom" type="text" component={this.renderFieldInput} placeholder="Sage femme / Gynécologue"/>
                             </Grid.Column>
                             <Grid.Column>
-                                <Field name="sfGyneco.ville" type="text" component={this.renderFieldInput} label="Ville"/>
+                                <Field name="sfGyneco.ville" type="text" component={this.renderFieldInput} placeholder="Ville"/>
                             </Grid.Column>
                         </Grid.Row>
 
@@ -308,10 +319,10 @@ class PatienteForm extends Component {
 
                         <Grid.Row>
                             <Grid.Column>
-                                <Field name='allergies.ouinon' label='Allergies' labels={['oui', 'non']} component={this.renderFieldRadioVertical} />
+                                <Field name='allergies.ouinon' label='Allergies' labels={['oui', 'non']} component={this.renderFieldRadioHorizontal} />
                             </Grid.Column>
                             <Grid.Column>
-                                <Field name="allergies.autres" type="text" component={this.renderFieldTextareaNoLabel} label="Autres" />
+                                <Field name="allergies.autres" type="text" component={this.renderFieldTextarea} label="Autres" displayLabel={false} />
                             </Grid.Column>
                         </Grid.Row>
 
@@ -352,17 +363,69 @@ class PatienteForm extends Component {
                             </Grid.Column>
                         </Grid.Row>
 
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Field name='taille' placeholder='Taille' label={{basic: true, content: 'cm'}} labelPosition='right' component={this.renderFieldInput} onChange={this.calculImc} />
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Field name="poids" placeholder='Poids'  label={{basic: true, content: 'kg'}} labelPosition='right' type="text" component={this.renderFieldInput} onChange={this.calculImc} />
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Form.Field>
+                                    <Label>IMC</Label>
+                                    <Segment basic style={{padding:'9.5px', marginTop:'0px'}}>{imc ? imc : ''}</Segment>
+                                </Form.Field>
+                            </Grid.Column>
+                        </Grid.Row>
+
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Field name='tabac.ouinon' label='Tabac' labels={['oui', 'non']} component={this.renderFieldRadioHorizontal} />
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Field name="tabac.autres" type="text" component={this.renderFieldTextarea} label="Tabac" displayLabel={false} />
+                            </Grid.Column>
+                        </Grid.Row>
+
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Field name='alcool.ouinon' label='Alcool' labels={['oui', 'non']} component={this.renderFieldRadioHorizontal} />
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Field name="alcool.autres" type="text" component={this.renderFieldTextarea} label="Alcool" displayLabel={false} />
+                            </Grid.Column>
+                        </Grid.Row>
+
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Field name='toxiques.ouinon' label='Toxiques' labels={['oui', 'non']} component={this.renderFieldRadioHorizontal} />
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Field name="toxiques.autres" type="text" component={this.renderFieldTextarea} label="Toxiques" displayLabel={false} />
+                            </Grid.Column>
+                        </Grid.Row>
+
                         <Divider horizontal>Antécédents familiaux</Divider>
 
                         <Grid.Row>
                             <Grid.Column>
                                 <Form.Field>
-                                    <Field name='antecedents.familiaux.aucun' label='Aucun' component={this.renderFieldCheckbox} />
-                                    <Field name='antecedents.familiaux.diabete' label='Diabète' component={this.renderFieldCheckbox} />
-                                    <Field name='antecedents.familiaux.obesite' label='Obésité' component={this.renderFieldCheckbox} />
-                                    <Field name='antecedents.familiaux.hta' label='HTA' component={this.renderFieldCheckbox} />
-                                    <Field name='antecedents.familiaux.cardiovasculaires' label='Cardiovasculaires' component={this.renderFieldCheckbox} />
-                                    <Field name='antecedents.familiaux.cancershormonodependants' label='Cancers hormonodépendants' component={this.renderFieldCheckbox} />
+                                    <Grid columns='equal'>
+                                        <Grid.Row>
+                                            <Grid.Column>
+                                                <Field name='antecedents.familiaux.aucun' label='Aucun' component={this.renderFieldCheckbox} />
+                                                <Field name='antecedents.familiaux.diabete' label='Diabète' component={this.renderFieldCheckbox} />
+                                            </Grid.Column>
+                                            <Grid.Column>
+                                                <Field name='antecedents.familiaux.obesite' label='Obésité' component={this.renderFieldCheckbox} />
+                                                <Field name='antecedents.familiaux.hta' label='HTA' component={this.renderFieldCheckbox} />
+                                            </Grid.Column>
+                                            <Grid.Column>
+                                                <Field name='antecedents.familiaux.cardiovasculaires' label='Cardiovasculaires' component={this.renderFieldCheckbox} />
+                                                <Field name='antecedents.familiaux.cancershormonodependants' label='Cancers hormonodépendants' component={this.renderFieldCheckbox} />
+                                            </Grid.Column>
+                                        </Grid.Row>
+                                    </Grid>
                                 </Form.Field>
                             </Grid.Column>
                         </Grid.Row>
@@ -380,7 +443,7 @@ class PatienteForm extends Component {
                                                 <Field name='antecedents.medicaux.migraines' label='Migraines' component={this.renderFieldCheckbox} />
                                             </Grid.Column>
                                             <Grid.Column>
-                                                <Field name="antecedents.medicaux.autres" type="text" component={this.renderFieldTextareaNoLabel} label="Autres" displayLabel={false} />
+                                                <Field name="antecedents.medicaux.autres" type="text" component={this.renderFieldTextarea} label="Autres" displayLabel={false} />
                                             </Grid.Column>
                                         </Grid.Row>
                                     </Grid>
@@ -401,22 +464,116 @@ class PatienteForm extends Component {
                                                 <Field name='antecedents.chirurgicaux.dds' label='DDS' component={this.renderFieldCheckbox} />
                                             </Grid.Column>
                                             <Grid.Column>
-                                                <Field name="antecedents.chirurgicaux.autres" type="text" component={this.renderFieldTextareaNoLabel} label="Autres" />
+                                                <Field name="antecedents.chirurgicaux.autres" type="text" component={this.renderFieldTextarea} label="Autres"  displayLabel={false} />
                                             </Grid.Column>
                                         </Grid.Row>
                                     </Grid>
                                 </Form.Field>
                             </Grid.Column>
                         </Grid.Row>
-                    </Grid>
 
-                    <Button primary onClick={() => handleSubmit} disabled={pristine || submitting}>Enregistrer</Button>
+                        <Divider horizontal>Antécédents gynécologiques</Divider>
+
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Form.Field>
+                                    <Grid columns='equal'>
+                                        <Grid.Row>
+                                            <Grid.Column>
+                                                <Field name='antecedents.gynecologiques.aucun' label='Aucun' component={this.renderFieldCheckbox} />
+                                                <Field name='antecedents.gynecologiques.kystesovaire' label="Kystes de l'ovaire" component={this.renderFieldCheckbox} />
+                                                <Field name='antecedents.gynecologiques.fibromesuterins' label='Fibromes utérins' component={this.renderFieldCheckbox} />
+                                            </Grid.Column>
+                                            <Grid.Column>
+                                                <Field name='antecedents.gynecologiques.endometriose' label='Endométriose' component={this.renderFieldCheckbox} />
+                                                <Field name='antecedents.gynecologiques.hysterectomie' label='Hystérectomie' component={this.renderFieldCheckbox} />
+                                            </Grid.Column>
+                                            <Grid.Column>
+                                                <Field name="antecedents.gynecologiques.autres" type="text" component={this.renderFieldTextarea} label="Autres"  displayLabel={false} />
+                                            </Grid.Column>
+                                        </Grid.Row>
+                                    </Grid>
+                                </Form.Field>
+                            </Grid.Column>
+                        </Grid.Row>
+
+                        <Divider/>
+
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Field name='cyclesreguliers.ouinon' label='Cycles réguliers' labels={['oui', 'non']} component={this.renderFieldRadioHorizontal} />
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Field name="cyclesreguliers.autres" type="text" component={this.renderFieldTextarea} label="Cycles réguliers" displayLabel={false} />
+                            </Grid.Column>
+                        </Grid.Row>
+
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Field name='vaccinationhpv' label='Vaccination HPV' labels={['oui', 'non', 'en cours']} component={this.renderFieldRadioHorizontal} />
+                            </Grid.Column>
+                        </Grid.Row>
+
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Field name='dernierfrottis.date' component={this.renderFieldDate} label="Dernier frottis" />
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Field name="dernierfrottis.resultat" type="text" component={this.renderFieldTextarea} label="Résultat"  displayLabel={false} />
+                            </Grid.Column>
+                        </Grid.Row>
+
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Form.Field>
+                                    <Grid columns='equal'>
+                                        <Label>Contraception</Label>
+                                        <Grid.Row>
+                                            <Grid.Column>
+                                                <Field name='contraception.aucun' label='Aucun' component={this.renderFieldCheckbox} />
+                                                <Field name='contraception.estroprogestatifs' label='Estroprogestatifs' component={this.renderFieldCheckbox} />
+                                                <Field name='contraception.microprogestatifs' label='Microprogestatifs' component={this.renderFieldCheckbox} />
+                                                <Field name='contraception.monoprogestatifs' label='Monoprogestatifs' component={this.renderFieldCheckbox} />
+                                            </Grid.Column>
+                                            <Grid.Column>
+                                                <Field name='contraception.diuSiu' label='DIU / SIU' component={this.renderFieldCheckbox} />
+                                                <Field name='contraception.localeBarriere' label='Locale / barrière' component={this.renderFieldCheckbox} />
+                                                <Field name='contraception.naturelle' label='Naturelle' component={this.renderFieldCheckbox} />
+                                            </Grid.Column>
+                                            <Grid.Column>
+                                                <Field name="contraception.autre" type="text" component={this.renderFieldTextarea} label="Autre"  displayLabel={false} />
+                                            </Grid.Column>
+                                        </Grid.Row>
+                                    </Grid>
+                                </Form.Field>
+                            </Grid.Column>
+                        </Grid.Row>
+
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Field name="age.premieresregles" type="text" component={this.renderFieldInput} placeholder="Age premières règles" />
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Field name="age.premiersrapports" type="text" component={this.renderFieldInput} placeholder="Age premiers rapports" />
+                            </Grid.Column>
+                        </Grid.Row>
+
+
+                        <Grid.Row>
+                            <Grid.Column textAlign='center'>
+                                <Button primary onClick={() => handleSubmit} disabled={pristine || submitting}>Enregistrer</Button>
+                            </Grid.Column>
+                        </Grid.Row>
+
+                    </Grid>
                 </Form>
 
             </div>
         )
     }
 }
+
+
 
 function calculAge(dateNaissance) {
     if (!dateNaissance) {
@@ -456,8 +613,6 @@ function calculAge(dateNaissance) {
 
         }
     }
-
-    console.log('age='+age);
 
     return age; // que l'on place dans le input d'id Age
 }

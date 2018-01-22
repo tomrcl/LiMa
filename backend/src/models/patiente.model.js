@@ -44,19 +44,33 @@ module.exports = function (app) {
         carteAjour: String
       }
     },
+    taille: Number,
+    poids: Number,
+    tabac: {
+      ouinon: String,
+      autres: String
+    },
+    alcool: {
+      ouinon: String,
+      autres: String
+    },
+    toxiques: {
+      ouinon: String,
+      autres: String
+    },
     antecedents: {
       familiaux: {
-        aucun: String,
-        diabete: String,
-        obesite: String,
-        hta: String,
-        cardiovasculaires: String,
+        aucun: Boolean,
+        diabete: Boolean,
+        obesite: Boolean,
+        hta: Boolean,
+        cardiovasculaires: Boolean,
         cancershormonodependants: String
       },
       medicaux: {
-        aucun: String,
-        asthme: String,
-        migraines: String,
+        aucun: Boolean,
+        asthme: Boolean,
+        migraines: Boolean,
         autres: String
       },
       chirurgicaux: {
@@ -64,7 +78,48 @@ module.exports = function (app) {
         appendicectomie: String,
         dds: String,
         autres: String
-      }
+      },
+      gynecologiques: {
+        aucun: String,
+        kystesovaire: String,
+        fibromesuterins: String,
+        endometriose: String,
+        hysterectomie: String,
+        autres: String
+      },
+      obstetricaux: [{
+        date: Date,
+        terme: String,
+        grossesse: String,
+        lieu: String,
+        modeAccouchement: String,
+        nouveauNe: String,
+        allaitement: String
+      }]
+    },
+    cyclesreguliers: {
+      ouinon: String,
+      autres: String
+    },
+    vaccinationhpv: String,
+    dernierfrottis: {
+      date: Date,
+      resultat: String
+    },
+    contraception: {
+      aucun: String,
+      estroprogestatifs: String,
+      microprogestatifs: String,
+      monoprogestatifs: String,
+      diuSiu: String,
+      localeBarriere: String,
+      naturelle: String,
+      localeBarriere: String,
+      autre: String
+    },
+    age: {
+      premieresregles: String,
+      premiersrapports: String
     },
     createdAt: Date,
     updatedAt: { type: Date, 'default': Date.now }

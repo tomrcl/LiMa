@@ -40,6 +40,7 @@ export function fetchPatiente(_id) {
 }
 
 export function updatePatiente(patiente) {
+    console.log(patiente);
     return dispatch => {
         return dispatch({
             type: 'UPDATE_PATIENTE',

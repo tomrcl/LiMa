@@ -22,7 +22,7 @@ class MainPage extends Component {
                     </Menu.Item>
                     <Menu.Item as={NavLink} exact to='/'>Liste des patientes</Menu.Item>
                     <Menu.Item as={NavLink} to='/patientes/search'>Recherche</Menu.Item>
-                    <Menu.Item as={NavLink} to='/patientes/new'>Créer une patiente</Menu.Item>
+                    <Menu.Item as={NavLink} exact to='/patientes/new'>Créer une patiente</Menu.Item>
 
 
                 </Container>

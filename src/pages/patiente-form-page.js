@@ -40,7 +40,7 @@ class PatienteFormPage extends Component {
             <div>
                 {
                     this.state.redirect ?
-                        <Redirect to="/" /> :
+                        <Redirect to={`/patientes/view/${this.props.patiente._id}`} /> :
                         <PatienteForm patiente={this.props.patiente} loading={this.props.loading} onSubmit={this.submit} />
                 }
             </div>
