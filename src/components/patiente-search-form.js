@@ -2,7 +2,7 @@ import React, { Component} from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types'
 import _ from 'lodash'
-import { Redirect, Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 
 import { Search, Label } from 'semantic-ui-react'
 
@@ -18,14 +18,7 @@ resultRenderer.propTypes = {
 
 class PatienteSearchForm extends Component {
 
-    constructor(props) {
-        super(props);
-
-        console.log('cons');
-    }
-
     componentWillMount() {
-        console.log('will mount');
         this.resetComponent()
     }
 

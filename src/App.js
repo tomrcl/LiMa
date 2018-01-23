@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NavLink, Route } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
 import MainPage from './pages/main-page';
 import PatienteListPage from './pages/patiente-list-page';

@@ -91,10 +91,10 @@ module.exports = function (app) {
         date: Date,
         terme: String,
         grossesse: String,
-        lieu: String,
         modeAccouchement: String,
         nouveauNe: String,
-        allaitement: String
+        allaitement: String,
+        perinee: String
       }]
     },
     cyclesreguliers: {

@@ -1,8 +1,6 @@
 import React, { Component} from 'react';
 import { NavLink } from 'react-router-dom';
-import { Menu, Container, Image, Divider } from 'semantic-ui-react';
-
-import PatienteSearchForm from '../components/patiente-search-form';
+import { Menu, Container, Image } from 'semantic-ui-react';
 
 class MainPage extends Component {
 

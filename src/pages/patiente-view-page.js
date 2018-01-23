@@ -1,14 +1,18 @@
 import React, { Component} from 'react';
 import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-import { fetchPatiente } from '../actions/patiente-actions';
-import { Icon, Segment, Label, List, Grid, Divider, Transition, Table, Header } from 'semantic-ui-react';
+import { fetchPatiente, updatePatiente } from '../actions/patiente-actions';
+import { Icon, Segment, Label, List, Grid, Divider, Transition } from 'semantic-ui-react';
 import AntecedentsObsTable from '../components/antecedents_obstetricaux-table';
+import * as CommonFields from '../components/commonFields';
+
 
 class PatienteViewPage extends Component {
 
     state = {
         showInformations: false,
+        antecedentsObs: [],
+        antecedentsObsCount: 0
     }
 
     showInformationsHandle = () => {
@@ -19,6 +23,11 @@ class PatienteViewPage extends Component {
         const { _id } = this.props.match.params;
         if(_id){
             this.props.fetchPatiente(_id)
+                .then(response =>
+                    this.setState({
+                        antecedentsObs: this.getData('antecedents', 'obstetricaux'),
+                        antecedentsObsCount: this.getData('antecedents', 'obstetricaux').length
+                    }));
         }
     }
 
@@ -30,15 +39,42 @@ class PatienteViewPage extends Component {
         }
     }
 
+    submit = (antecedentObs) => {
+        console.log(antecedentObs)
+        // ajoute l'antecedentObs à la patiente
+        this.props.patiente.antecedents.obstetricaux.push(antecedentObs)
+        this.props.updatePatiente(this.props.patiente)
+            .then(response => {
+                console.log(this.props.patiente.antecedents.obstetricaux);
+                this.setState({
+                    antecedentsObs: this.props.patiente.antecedents.obstetricaux,
+                    antecedentsObsCount: this.props.patiente.antecedents.obstetricaux.length
+                });
+            })
+            .catch(err => console.error(err));
+    }
+
+    deleteAntecedentObs = (antecedentObsIdx) => {
+        this.props.patiente.antecedents.obstetricaux.splice(antecedentObsIdx, 1);
+        this.props.updatePatiente(this.props.patiente)
+            .then(response => {
+                this.setState({
+                    antecedentsObs: this.props.patiente.antecedents.obstetricaux,
+                    antecedentsObsCount: this.props.patiente.antecedents.obstetricaux.length
+                })
+            })
+            .catch(err => console.error(err));
+    }
+
     render() {
-        const { showInformations } = this.state;
+        const { showInformations, antecedentsObs, antecedentsObsCount } = this.state;
 
         return (
             <div>
                 <Grid columns='equal'>
                     <Grid.Row>
                         <Grid.Column>
-                            {this.props.patiente.nomJf} {this.props.patiente.nom} {this.props.patiente.prenom}
+                            <h1>{CommonFields.fullName(this.props.patiente)}</h1>
                         </Grid.Column>
 
                         <Grid.Column>
@@ -95,7 +131,7 @@ class PatienteViewPage extends Component {
 
                 <Divider horizontal>Antécédents obstétricaux</Divider>
 
-                <AntecedentsObsTable patiente={this.props.patiente}/>
+                <AntecedentsObsTable antecedents={antecedentsObs} counter={antecedentsObsCount} loading={this.props.loading} onSubmit={this.submit} deleteAntecedentObs={this.deleteAntecedentObs}/>
             </div>
         )
     }
@@ -107,4 +143,4 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps, {fetchPatiente})(PatienteViewPage);
+export default connect(mapStateToProps, {fetchPatiente, updatePatiente})(PatienteViewPage);
