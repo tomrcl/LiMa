@@ -121,6 +121,16 @@ module.exports = function (app) {
       premieresregles: String,
       premiersrapports: String
     },
+    consultations: {
+      autre:[{
+        date: Date,
+        description: String
+      }],
+      entretienPrenatal:[{
+        date:Date,
+        description: String
+      }]
+    },
     createdAt: Date,
     updatedAt: { type: Date, 'default': Date.now }
 

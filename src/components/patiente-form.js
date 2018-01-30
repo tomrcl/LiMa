@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Prompt} from 'react-router-dom'
-import { Form, Button, Transition, Segment, Grid, Divider, Label } from 'semantic-ui-react';
+import { Form, Button, Transition, Segment, Grid, Divider, Label, Container } from 'semantic-ui-react';
 import { Field, reduxForm } from 'redux-form';
 import Moment from 'moment';
 import momentLocalizer from 'react-widgets-moment';
@@ -82,7 +82,7 @@ class PatienteForm extends Component {
         const {showPartenaireForm, age, agePartenaire, showPereGroupeSanguinForm, imc} = this.state;
 
         return (
-            <div>
+            <Container>
                 <Prompt
                     when={!pristine}
                     message='Etes-vous sur de vouloir quitter le formulaire ?'
@@ -90,13 +90,11 @@ class PatienteForm extends Component {
 
                 <h1 style={{marginTop: "1em"}}>{this.props.patiente._id ? 'Modifier fiche '+ CommonFields.fullName(this.props.patiente) : 'Nouvelle patiente'}</h1>
 
-
                 <Form onSubmit={handleSubmit} loading={loading}>
 
                     <Grid columns='equal'>
 
                         <Divider horizontal>Administratif</Divider>
-
 
                         <Grid.Row>
                             <Grid.Column>
@@ -135,7 +133,7 @@ class PatienteForm extends Component {
                         <Grid.Row>
                             <Grid.Column>
                                 <Field name='statut' label='Statut' labels={['Célibataire', 'En couple', 'Divorcée', 'Veuve']} component={CommonFields.renderFieldRadioHorizontal} onChange={this.statutRadioHandle} />
-                                <Transition visible={showPartenaireForm} animation='scale' duration={500}>
+                                <Transition visible={showPartenaireForm ? showPartenaireForm : false} animation='scale' duration={500}>
                                     <Segment padded>
                                         <Label attached='top'>Partenaire</Label>
                                         <Grid columns='equal'>
@@ -220,7 +218,7 @@ class PatienteForm extends Component {
 
                         <Grid.Row>
                             <Grid.Column>
-                                <Transition visible={showPereGroupeSanguinForm} animation='scale' duration={500}>
+                                <Transition visible={showPereGroupeSanguinForm ? showPereGroupeSanguinForm : false} animation='scale' duration={500}>
                                     <Segment padded>
                                         <Label attached='top'>Père</Label>
                                         <Grid columns='equal'>
@@ -438,7 +436,7 @@ class PatienteForm extends Component {
                     </Grid>
                 </Form>
 
-            </div>
+            </Container>
         )
     }
 }

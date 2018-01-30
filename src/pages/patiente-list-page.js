@@ -16,7 +16,6 @@ class PatienteListPage extends Component {
     }
 }
 
-// Make contacts  array available in  props
 function mapStateToProps(state) {
     return {
         patientes : state.patienteStore.patientes

@@ -9,7 +9,6 @@ import { Search, Label } from 'semantic-ui-react'
 import { fetchPatientes } from '../actions/patiente-actions';
 
 const resultRenderer = ({ nomJf }) => <Label content={nomJf} />
-// const resultRenderer = ({ nomJf, _id }) => <Link to={'/patientes/view/' + _id} >{nomJf}</Link>
 
 resultRenderer.propTypes = {
     nomJf: PropTypes.string,
@@ -18,23 +17,34 @@ resultRenderer.propTypes = {
 
 class PatienteSearchForm extends Component {
 
-    componentWillMount() {
-        this.resetComponent()
+    constructor () {
+        super();
+        this.state = {
+            fireRedirect: false
+        }
+    }
+
+    componentWillRecieveProps(nextProps) {
+        this.setState({ fireRedirect: false })
+    }
+
+    componentDidMount() {
+        this.props.fetchPatientes();
     }
 
     resetComponent = () => this.setState({
         isLoading: false,
         results: [],
         value: '',
-        redirect: false,
+        patienteId: ''
     })
 
     handleResultSelect = (e, { result }) => {
-         this.setState({ redirect: true, value: result._id })
+        console.log(result._id);
+        this.setState({ fireRedirect: true, value: '', patienteId: result._id })
     }
 
     handleSearchChange = (e, { value }) => {
-        this.props.fetchPatientes();
         this.setState({ isLoading: true, value })
 
         setTimeout(() => {
@@ -51,14 +61,13 @@ class PatienteSearchForm extends Component {
     }
 
     render() {
-        const { isLoading, value, results, redirect } = this.state
+        const { isLoading, value, results, patienteId, fireRedirect } = this.state
 
         return (
             <div>
-            {
-                redirect ?
-                    <Redirect to={'/patientes/view/' + value} />
-                    :
+                {fireRedirect && patienteId && (
+                    <Redirect to={'/patientes/view_redirect/'+patienteId}/>
+                )}
                 <Search
                     loading={isLoading}
                     onResultSelect={this.handleResultSelect}
@@ -67,8 +76,9 @@ class PatienteSearchForm extends Component {
                     value={value}
                     {...this.props}
                     resultRenderer={resultRenderer}
+                    noResultsMessage='Aucun résultat'
+                    placeholder='Chercher une patiente'
                 />
-            }
             </div>
         )
     }

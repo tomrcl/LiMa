@@ -3,6 +3,9 @@ import React from 'react';
 import { Form, Input, Checkbox, Grid, Radio, TextArea, Icon, Label } from 'semantic-ui-react';
 import classnames from 'classnames';
 import DateTimePicker from 'react-widgets/lib/DateTimePicker';
+import Moment from 'moment'
+
+Moment.locale('fr')
 
 const dateFormats = [
     'DD/MM/YYYY',
@@ -32,21 +35,21 @@ export const renderFieldInputIcon = ({input, label, type, icon, meta: {touched, 
     </Form.Field>
 )
 
-export const renderFieldTextarea = ({input, label, displayLabel=true, type, meta: {touched, error}}) => (
+export const renderFieldTextarea = ({input, label, displayLabel=true, type, style, meta: {touched, error}}) => (
     <Form.Field className={classnames({error: touched && error})}>
         {displayLabel &&
         <Label>{label}</Label>
         }
-        <TextArea {...input} placeholder={label}/>
+        <TextArea {...input} placeholder={label} style={style} />
         {touched && error && <span className="error">{error.message}</span>}
     </Form.Field>
 )
 
-export const renderFieldDate = ({input, name, label, meta: {touched, error}}) => (
+export const renderFieldDate = ({input, name, label, dateOfDay=false, meta: {touched, error}}) => (
     <Form.Field className={classnames({error: touched && error})}>
         <Label>{label}</Label>
         <DateTimePicker
-            value={input.value ? new Date(input.value) : null}
+            value={input.value ? new Date(input.value) : (dateOfDay ? new Date() : null) }
             name={name}
             format='DD/MM/YYYY'
             time={false}
@@ -168,4 +171,17 @@ export function calculAge(dateNaissance) {
     }
 
     return age; // que l'on place dans le input d'id Age
+}
+
+export function displayDate(date) {
+    const formattedDT = Moment(date).format('DD/MM/YYYY');
+    return formattedDT;
+}
+
+export function getData(patiente, parent, key) {
+    if (patiente[parent]) {
+        return patiente[parent][key];
+    } else {
+        return '';
+    }
 }
