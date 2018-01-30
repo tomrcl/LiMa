@@ -88,7 +88,7 @@ class PatienteForm extends Component {
                     message='Etes-vous sur de vouloir quitter le formulaire ?'
                 />
 
-                <h1 style={{marginTop: "1em"}}>{this.props.patiente._id ? 'Modifier fiche '+ CommonFields.fullName(this.props.patiente) : 'Nouvelle patiente'}</h1>
+                <h1 style={{marginTop: "1em"}}>{this.props.patiente._id ? 'Modifier fiche '+ CommonFields.fullNameWithDate(this.props.patiente) : 'Nouvelle patiente'}</h1>
 
                 <Form onSubmit={handleSubmit} loading={loading}>
 

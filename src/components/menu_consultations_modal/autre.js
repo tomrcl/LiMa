@@ -1,7 +1,7 @@
 import React, { Component} from 'react';
 import {Field, reduxForm} from 'redux-form';
 import { Modal, Header, Grid, Button, Container, Form } from 'semantic-ui-react';
-import * as CommonFields from './commonFields';
+import * as CommonFields from '../commonFields';
 
 
 class MenuConsultationsModalAutre extends Component {
@@ -50,4 +50,4 @@ class MenuConsultationsModalAutre extends Component {
     }
 }
 
-export default reduxForm({form:'modalAutre'})(MenuConsultationsModalAutre);
+export default reduxForm({form:'modal'})(MenuConsultationsModalAutre);

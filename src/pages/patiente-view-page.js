@@ -19,27 +19,9 @@ class PatienteViewPage extends Component {
         this.setState({showInformations:!this.state.showInformations});
     }
 
-    // componentWillReceiveProps(nextProps) {
-    //     console.log('willreceice')
-    //     const { _id } = nextProps.match.params;
-    //         console.log("id=" + _id)
-    //         console.log("propsidwillreceveive=" + this.props.patiente._id)
-    //     if (_id && (_id !== this.props.patiente._id)) {
-    //         // this.props.initialize(patiente)
-    //         this.props.fetchPatiente(_id)
-    //             .then(response =>
-    //                 this.setState({
-    //                     antecedentsObs: CommonFields.getData(this.props.patiente, 'antecedents', 'obstetricaux'),
-    //                     antecedentsObsCount: CommonFields.getData(this.props.patiente, 'antecedents', 'obstetricaux').length
-    //                 }));
-    //     }
-    // }
-
     componentDidMount() {
-        console.log('didmount')
         const { _id } = this.props.match.params;
         if(_id){
-            // console.log("propsiddidmount="+_id)
             this.props.fetchPatiente(_id)
                 .then(response =>
                     this.setState({
@@ -89,7 +71,7 @@ class PatienteViewPage extends Component {
             <Segment style={{ padding: '0em' }} vertical>
                 <Grid celled='internally' columns='equal' stackable>
                     <Grid.Row>
-                        <Grid.Column style={{maxWidth:'270px'}}>
+                        <Grid.Column style={{maxWidth:'318px'}}>
                             <MenuConsultations/>
 
                         </Grid.Column>
@@ -97,7 +79,7 @@ class PatienteViewPage extends Component {
 
                             <Grid columns='equal'>
                                 <Grid.Column width={10}>
-                                    <h2>{CommonFields.fullName(this.props.patiente)}</h2>
+                                    <h2>{CommonFields.fullNameWithDate(this.props.patiente)}</h2>
                                 </Grid.Column>
 
                                 <Grid.Column>

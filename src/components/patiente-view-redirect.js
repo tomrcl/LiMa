@@ -16,7 +16,6 @@ class PatienteViewRedirect extends Component {
 
     render() {
         const { patienteId, fireRedirect } = this.state;
-        console.log('redirect !')
 
         return (
             fireRedirect &&

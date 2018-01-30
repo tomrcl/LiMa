@@ -119,13 +119,22 @@ export const renderFieldRadioVertical = ({ input, label, labels, name, meta: {to
     </Form.Field>
 )
 
-export function fullName(patiente) {
+export function fullNameWithDate(patiente) {
     const age = calculAge(patiente.dateNaissance);
 
-    return patiente.nomJf +
-        ' ' + patiente.nom +
-        ' ' + patiente.prenom +
-        ' (' + age + ' ans)'
+    if (age) {
+        return fullName(patiente.nomJf, patiente.nom, patiente.prenom) +
+            ' (' + age + ' ans)';
+    } else {
+        return fullName(patiente.nomJf, patiente.nom, patiente.prenom);
+    }
+
+}
+
+export function fullName(nomJf, nom, prenom) {
+    return nomJf +
+        ' ' + nom +
+        ' ' + prenom
 }
 
 export function calculAge(dateNaissance) {

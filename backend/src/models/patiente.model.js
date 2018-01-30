@@ -129,11 +129,14 @@ module.exports = function (app) {
       entretienPrenatal:[{
         date:Date,
         description: String
+      }],
+      reeducPerinee:[{
+        date:Date,
+        description: String
       }]
     },
     createdAt: Date,
     updatedAt: { type: Date, 'default': Date.now }
-
   });
 
   return mongooseClient.model('patiente', patiente);

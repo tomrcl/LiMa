@@ -1,19 +1,13 @@
 import React, { Component} from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { Redirect } from 'react-router-dom';
-
 import { Search, Label } from 'semantic-ui-react'
-
 import { fetchPatientes } from '../actions/patiente-actions';
+import * as CommonFields from '../components/commonFields';
 
-const resultRenderer = ({ nomJf }) => <Label content={nomJf} />
-
-resultRenderer.propTypes = {
-    nomJf: PropTypes.string,
-    _id: PropTypes.string,
-}
+// const resultRenderer = ({ nomJf, nom, prenom }) => <Label content={CommonFields.fullName(nomJf, nom, prenom)} />
+const resultRenderer = ({ nomJf, nom, prenom }) => <label>{CommonFields.fullName(nomJf, nom, prenom)}</label>
 
 class PatienteSearchForm extends Component {
 
@@ -22,10 +16,6 @@ class PatienteSearchForm extends Component {
         this.state = {
             fireRedirect: false
         }
-    }
-
-    componentWillRecieveProps(nextProps) {
-        this.setState({ fireRedirect: false })
     }
 
     componentDidMount() {
@@ -40,24 +30,26 @@ class PatienteSearchForm extends Component {
     })
 
     handleResultSelect = (e, { result }) => {
-        console.log(result._id);
-        this.setState({ fireRedirect: true, value: '', patienteId: result._id })
+        // on ne redirige pas si on est sur le même ID client
+        if (!window.location.pathname.endsWith('/'+result._id)) {
+            this.setState({ fireRedirect: true, value: '', patienteId: result._id })
+        }
     }
 
     handleSearchChange = (e, { value }) => {
-        this.setState({ isLoading: true, value })
+        this.setState({ fireRedirect: false, isLoading: true, value })
 
         setTimeout(() => {
             if (this.state.value.length < 1) return this.resetComponent()
 
             const re = new RegExp(_.escapeRegExp(this.state.value), 'i')
-            const isMatch = result => re.test(result.nomJf)
+            const isMatch = result => re.test(CommonFields.fullName(result.nomJf, result.nom, result.prenom))
 
             this.setState({
                 isLoading: false,
                 results: _.filter(this.props.patientes, isMatch),
             })
-        }, 500)
+        }, 200)
     }
 
     render() {
@@ -76,7 +68,7 @@ class PatienteSearchForm extends Component {
                     value={value}
                     {...this.props}
                     resultRenderer={resultRenderer}
-                    noResultsMessage='Aucun résultat'
+                    noResultsMessage='Aucune patiente trouvée...'
                     placeholder='Chercher une patiente'
                 />
             </div>
