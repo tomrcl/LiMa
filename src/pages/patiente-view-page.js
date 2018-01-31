@@ -1,11 +1,15 @@
 import React, { Component} from 'react';
 import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
-import { fetchPatiente, updatePatiente } from '../actions/patiente-actions';
 import { Icon, Segment, Label, List, Grid, Divider, Transition } from 'semantic-ui-react';
+
+import { fetchPatiente, updatePatiente } from '../actions/patiente-actions';
+
 import MenuConsultations from '../components/menu_consultations'
 import AntecedentsObsTable from '../components/antecedents_obstetricaux-table';
 import * as CommonFields from '../components/commonFields';
+
+import Graphique from '../components/graphique';
 
 class PatienteViewPage extends Component {
 
@@ -70,69 +74,69 @@ class PatienteViewPage extends Component {
         return (
             <Segment style={{ padding: '0em' }} vertical>
                 <Grid celled='internally' columns='equal' stackable>
-                    <Grid.Row>
-                        <Grid.Column style={{maxWidth:'318px'}}>
-                            <MenuConsultations/>
+                    <Grid.Column style={{maxWidth:'300px'}}>
+                        <MenuConsultations/>
 
-                        </Grid.Column>
-                        <Grid.Column>
+                    </Grid.Column>
+                    <Grid.Column>
 
-                            <Grid columns='equal'>
-                                <Grid.Column width={10}>
-                                    <h2>{CommonFields.fullNameWithDate(this.props.patiente)}</h2>
-                                </Grid.Column>
+                        <Grid columns='equal'>
+                            <Grid.Column width={10}>
+                                <h2>{CommonFields.fullNameWithDate(this.props.patiente)}</h2>
+                            </Grid.Column>
 
-                                <Grid.Column>
-                                    <Label as='a' onClick={this.showInformationsHandle}>
-                                        <Icon name='info' />
-                                        <Label.Detail>Informations</Label.Detail>
-                                    </Label>
-                                </Grid.Column>
+                            <Grid.Column>
+                                <Label as='a' onClick={this.showInformationsHandle}>
+                                    <Icon name='info' />
+                                    <Label.Detail>Informations</Label.Detail>
+                                </Label>
+                            </Grid.Column>
 
-                                <Grid.Column floated='right'>
-                                    <Label as={NavLink} to={`/patientes/edit/${this.props.patiente._id}`}>
-                                        <Icon name='edit'/>
-                                        Modifier
-                                    </Label>
-                                </Grid.Column>
-                            </Grid>
+                            <Grid.Column floated='right'>
+                                <Label as={NavLink} to={`/patientes/edit/${this.props.patiente._id}`}>
+                                    <Icon name='edit'/>
+                                    Modifier
+                                </Label>
+                            </Grid.Column>
+                        </Grid>
 
-                            <Transition visible={showInformations === true} animation='fade down' duration={500}>
-                                <Segment padded>
-                                    <Label attached='top'>Informations patiente</Label>
-                                    <Grid columns='equal'>
-                                        <Grid.Row>
-                                            <Grid.Column>
-                                                <Segment padded>
-                                                    <Label attached='top left'>Administratif</Label>
-                                                    <List>
-                                                        <List.Item>{this.props.patiente.nomJf} {this.props.patiente.nom} {this.props.patiente.prenom}</List.Item>
-                                                        <List.Item>{this.props.patiente.dateNaissance}</List.Item>
-                                                        <List.Item>{this.props.patiente.email}</List.Item>
-                                                    </List>
-                                                </Segment>
-                                            </Grid.Column>
-                                            <Grid.Column>
+                        <Transition visible={showInformations === true} animation='fade down' duration={500}>
+                            <Segment padded>
+                                <Label attached='top'>Informations patiente</Label>
+                                <Grid columns='equal'>
+                                    <Grid.Row>
+                                        <Grid.Column>
+                                            <Segment padded>
+                                                <Label attached='top left'>Administratif</Label>
+                                                <List>
+                                                    <List.Item>{this.props.patiente.nomJf} {this.props.patiente.nom} {this.props.patiente.prenom}</List.Item>
+                                                    <List.Item>{this.props.patiente.dateNaissance}</List.Item>
+                                                    <List.Item>{this.props.patiente.email}</List.Item>
+                                                </List>
+                                            </Segment>
+                                        </Grid.Column>
+                                        <Grid.Column>
 
-                                                <Segment padded>
-                                                    <Label attached='top left'>Infos</Label>
-                                                    <List>
-                                                        <List.Item>Médecin: {CommonFields.getData(this.props.patiente, 'medecinTraitant', 'nom')}</List.Item>
-                                                        <List.Item>SF/Gynéco: {CommonFields.getData(this.props.patiente, 'sfGyneco', 'nom')}</List.Item>
-                                                        <List.Item>Allergies: {CommonFields.getData(this.props.patiente, 'allergies', 'ouinon')}</List.Item>
-                                                    </List>
-                                                </Segment>
-                                            </Grid.Column>
-                                        </Grid.Row>
-                                    </Grid>
-                                </Segment>
-                            </Transition>
+                                            <Segment padded>
+                                                <Label attached='top left'>Infos</Label>
+                                                <List>
+                                                    <List.Item>Médecin: {CommonFields.getData(this.props.patiente, 'medecinTraitant', 'nom')}</List.Item>
+                                                    <List.Item>SF/Gynéco: {CommonFields.getData(this.props.patiente, 'sfGyneco', 'nom')}</List.Item>
+                                                    <List.Item>Allergies: {CommonFields.getData(this.props.patiente, 'allergies', 'ouinon')}</List.Item>
+                                                </List>
+                                            </Segment>
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                </Grid>
+                            </Segment>
+                        </Transition>
 
-                            <Divider horizontal>Antécédents obstétricaux</Divider>
+                        <Divider horizontal>Antécédents obstétricaux</Divider>
 
-                            <AntecedentsObsTable antecedents={antecedentsObs} counter={antecedentsObsCount} loading={this.props.loading} onSubmit={this.submit} deleteAntecedentObs={this.deleteAntecedentObs}/>
-                        </Grid.Column>
-                    </Grid.Row>
+                        <AntecedentsObsTable antecedents={antecedentsObs} counter={antecedentsObsCount} loading={this.props.loading} onSubmit={this.submit} deleteAntecedentObs={this.deleteAntecedentObs}/>
+
+                        <Graphique/>
+                    </Grid.Column>
                 </Grid>
             </Segment>
         )

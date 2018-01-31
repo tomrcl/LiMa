@@ -123,6 +123,7 @@ module.exports = function (app) {
     },
     consultations: {
       autre:[{
+        libelle: String,
         date: Date,
         description: String
       }],
@@ -131,6 +132,7 @@ module.exports = function (app) {
         description: String
       }],
       reeducPerinee:[{
+        numero: String,
         date:Date,
         description: String
       }]

@@ -10,7 +10,7 @@ import MenuConsultationsModalAutre from './menu_consultations_modal/autre';
 
 const consultTypeLibelle = {
     'entretienPrenatal':'Entretien prénatal',
-    'reeducPerinee':'Réeducation du perinée',
+    'reeducPerinee':'CMP',
     'dossierGrossesse':'Dossier de grossesse',
     'visitePostNatale':'Visite post-natale',
     'suiviPostNatal':'Suivi post-natal',
@@ -98,7 +98,6 @@ class MenuConsultationsListe extends Component {
 
         this.props.updatePatiente(this.props.patiente)
             .then(response => {
-                console.log(this.props.patiente);
                 this.setState({
                     consultations: renderConsultations(this.props.patiente.consultations)});
             })
@@ -121,6 +120,18 @@ class MenuConsultationsListe extends Component {
                     consultations: renderConsultations(this.props.patiente.consultations)});
             })
             .catch(err => console.error(err));
+        this.modalClose();
+    }
+
+    renderLibelle = (consult) => {
+        if (consult.consultType === 'autre') {
+            return (consult.libelle ? consult.libelle : consult.consultTypeLibelle)
+        } else if (consult.consultType === 'reeducPerinee') {
+            return 'CMP' + (consult.numero ? ' n° ' + consult.numero : '')
+        } else {
+            return consult.consultTypeLibelle;
+        }
+
     }
 
     render() {
@@ -149,13 +160,10 @@ class MenuConsultationsListe extends Component {
                             <Button icon basic size='mini' onClick={() => this.editConsultation(consult)}>
                                 <Icon name='edit'/>
                             </Button>
-                            <Button icon basic size='mini' onClick={() => this.deleteConsultation(consult)}>
-                                <Icon name='delete' color='red'/>
-                            </Button>
                         </List.Content>
                         <List.Content>
                             <Label onClick={() => this.editConsultation(consult)} style={{paddingLeft:'0.3em', paddingRight:'0.3em'}}>
-                            {CommonFields.displayDate(consult.date)}  {consult.consultTypeLibelle}
+                            {CommonFields.displayDate(consult.date)} {this.renderLibelle(consult)}
                             </Label>
                         </List.Content>
                     </List.Item>
@@ -164,7 +172,7 @@ class MenuConsultationsListe extends Component {
 
                 <MenuConsultationsModalEntretienPrenatal isModalOpen={modalToDisplay==='entretienPrenatal'} consult={consult} modalClose={this.modalClose} onSubmit={this.saveConsultation}/>
                 <MenuConsultationsModalReeductPerinee isModalOpen={modalToDisplay==='reeducPerinee'} consult={consult} modalClose={this.modalClose} onSubmit={this.saveConsultation}/>
-                <MenuConsultationsModalAutre isModalOpen={modalToDisplay==='autre'} consult={consult} modalClose={this.modalClose} onSubmit={this.saveConsultation}/>
+                <MenuConsultationsModalAutre isModalOpen={modalToDisplay==='autre'} consult={consult} modalClose={this.modalClose} onSubmit={this.saveConsultation} deleteConsult={this.deleteConsultation}/>
             </Container>
         )
     }

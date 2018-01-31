@@ -26,17 +26,27 @@ class MenuConsultationsModalReeductPerinee extends Component {
                 <Modal
                     open={isModalOpen}
                 >
-                    <Header icon='browser' content='Réeducation du perinée'/>
+                    <Header icon='browser' content={'CMP' + (this.props.consult.numero ? ' n° ' + this.props.consult.numero : '')}/>
 
                     <Modal.Content scrolling>
                         <Form onSubmit={this.onSubmit} loading={loading}>
-                            <Grid>
-                                <Grid.Column>
-                                    <Field name="date" component={CommonFields.renderFieldDate}
-                                           label="Date" dateOfDay={true} />
-                                    <Field name="description" type="textarea" component={CommonFields.renderFieldTextarea}
-                                           label="Description" style={{ minHeight: 200 }}  />
-                                </Grid.Column>
+                            <Grid columns='equal'>
+                                <Grid.Row>
+                                    <Grid.Column>
+                                        <Field name="numero" type="text" component={CommonFields.renderFieldInput}
+                                               placeholder="N°"  />
+                                    </Grid.Column>
+                                    <Grid.Column>
+                                        <Field name="date" component={CommonFields.renderFieldDate}
+                                               label="Date" dateOfDay={true} />
+                                    </Grid.Column>
+                                </Grid.Row>
+                                <Grid.Row>
+                                    <Grid.Column>
+                                        <Field name="description" type="textarea" component={CommonFields.renderFieldTextarea}
+                                               label="Description" style={{ minHeight: 200 }}  />
+                                    </Grid.Column>
+                                </Grid.Row>
                             </Grid>
                         </Form>
                     </Modal.Content>
